@@ -28,8 +28,9 @@ const toJSON = (schema) => {
         }
       });
 
-      ret.id = ret.id.toString();
-      delete ret._id;
+      if (ret.id) {
+        ret.id = ret.id.toString();
+      }
       delete ret.__v;
       delete ret.createdAt;
       delete ret.updatedAt;

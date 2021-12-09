@@ -4,14 +4,8 @@ const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
 
-const userSchema = mongoose.Schema(
+const hrSchema = mongoose.Schema(
   {
-    id: {
-      type: String,
-      required: true,
-      trim: true,
-      unique: true,
-    },
     name: {
       type: String,
       required: true,
@@ -21,6 +15,7 @@ const userSchema = mongoose.Schema(
       type: String,
       unique: true,
       trim: true,
+      required: true,
       lowercase: true,
       validate(value) {
         if (!validator.isEmail(value)) {
@@ -38,7 +33,11 @@ const userSchema = mongoose.Schema(
     role: {
       type: String,
       enum: roles,
-      default: 'user',
+      default: 'hr',
+    },
+    listUser: {
+      type: [String],
+      default: [],
     },
     birthday: {
       type: String,
@@ -51,21 +50,6 @@ const userSchema = mongoose.Schema(
       type: String,
     },
     phone: {
-      type: String,
-    },
-    company: {
-      type: String,
-    },
-    skill: {
-      type: [String],
-    },
-    degree: {
-      type: String,
-    },
-    careerGoal: {
-      type: String,
-    },
-    cv: {
       type: String,
     },
     avatar: {
@@ -83,6 +67,9 @@ const userSchema = mongoose.Schema(
     website: {
       type: String,
     },
+    companyIntro: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -90,8 +77,8 @@ const userSchema = mongoose.Schema(
 );
 
 // add plugin that converts mongoose to json
-userSchema.plugin(toJSON);
-userSchema.plugin(paginate);
+hrSchema.plugin(toJSON);
+hrSchema.plugin(paginate);
 
 /**
  * Check if email is taken
@@ -99,8 +86,8 @@ userSchema.plugin(paginate);
  * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
  * @returns {Promise<boolean>}
  */
-userSchema.statics.isIdTaken = async function (id, excludeUserId) {
-  const user = await this.findOne({ id, _id: { $ne: excludeUserId } });
+hrSchema.statics.isEmailTaken = async function (email) {
+  const user = await this.findOne({ email });
   return !!user;
 };
 
@@ -109,12 +96,12 @@ userSchema.statics.isIdTaken = async function (id, excludeUserId) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-userSchema.methods.isPasswordMatch = async function (password) {
+hrSchema.methods.isPasswordMatch = async function (password) {
   const user = this;
   return bcrypt.compare(password, user.password);
 };
 
-userSchema.pre('save', async function (next) {
+hrSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
@@ -123,8 +110,8 @@ userSchema.pre('save', async function (next) {
 });
 
 /**
- * @typedef User
+ * @typedef Hr
  */
-const User = mongoose.model('User', userSchema);
+const Hr = mongoose.model('Hr', hrSchema);
 
-module.exports = User;
+module.exports = Hr;

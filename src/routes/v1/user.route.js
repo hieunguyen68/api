@@ -1,6 +1,17 @@
 const express = require('express');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, file.fieldname === 'cv' ? './uploads/cv/' : './uploads/avatar/');
+  },
+  filename(req, file, cb) {
+    cb(null, req.body.id + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const userValidation = require('../../validations/user.validation');
@@ -11,8 +22,16 @@ const router = express.Router();
 router
   .route('/')
   .post(validate(userValidation.createUser), userController.createUser)
-  .put(userController.updateUser)
+  .put(
+    upload.fields([
+      { name: 'avatar', maxCount: 1 },
+      { name: 'cv', maxCount: 1 },
+    ]),
+    userController.updateUser
+  )
   .get(userController.getUsers);
+
+router.route('/apply').post(userController.apply);
 
 router
   .route('/:id')

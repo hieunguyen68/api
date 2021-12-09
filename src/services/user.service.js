@@ -8,7 +8,7 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<User>}
  */
 const createUser = async (userBody) => {
-  if (await User.isIdTaken(userBody.email)) {
+  if (await User.isIdTaken(userBody.id)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'ID already taken');
   }
   return User.create(userBody);

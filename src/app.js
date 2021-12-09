@@ -1,7 +1,6 @@
 const express = require('express');
-const multer = require('multer');
-const upload = multer();
 const helmet = require('helmet');
+const path = require('path');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
@@ -17,7 +16,6 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
-
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -31,8 +29,7 @@ app.use(express.json());
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
-app.use(upload.array());
-app.use(express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // sanitize request data
 app.use(xss());
