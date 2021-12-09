@@ -21,15 +21,15 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(validate(userValidation.createUser), userController.createUser)
+  .get(userController.getUsers)
+  .post(upload.none(), userController.createUser)
   .put(
     upload.fields([
       { name: 'avatar', maxCount: 1 },
       { name: 'cv', maxCount: 1 },
     ]),
     userController.updateUser
-  )
-  .get(userController.getUsers);
+  );
 
 router.route('/apply').post(userController.apply);
 
