@@ -1,7 +1,41 @@
 const httpStatus = require('http-status');
 const path = require('path');
 const catchAsync = require('../utils/catchAsync');
-const { hrService, postService } = require('../services');
+const { hrService, postService, userService } = require('../services');
+
+const getCandidates = catchAsync(async (req, res) => {
+  const posts = await hrService.getPostByHrEmail(req.body.hrEmail);
+  const candidates = [];
+  await Promise.all(
+    posts.map(async (post) => {
+      const listCandidates = await Promise.all(post.candidates.map((i) => userService.getUserById(i)));
+      listCandidates.forEach((i) => {
+        candidates.push({
+          post,
+          user: i,
+        });
+      });
+    })
+  );
+  res.send(candidates);
+});
+
+const getStudents = catchAsync(async (req, res) => {
+  const posts = await hrService.getPostByHrEmail(req.body.hrEmail);
+  const students = [];
+  await Promise.all(
+    posts.map(async (post) => {
+      const listStudents = await Promise.all(post.approves.map((i) => userService.getUserById(i)));
+      listStudents.forEach((i) => {
+        students.push({
+          post,
+          user: i,
+        });
+      });
+    })
+  );
+  res.send(students);
+});
 
 const createPost = catchAsync(async (req, res) => {
   if (req.file) req.body.image = `${req.body.id}${path.extname(req.file.originalname)}`;
@@ -17,6 +51,17 @@ const createPost = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(post);
 });
 
+const updatePost = catchAsync(async (req, res) => {
+  if (req.file) req.body.image = `${req.body.id}${path.extname(req.file.originalname)}`;
+  const post = await hrService.updatePostById(req.body._id, req.body);
+  res.send(post);
+});
+
+const deletePost = catchAsync(async (req, res) => {
+  const post = await hrService.deletePost(req.body._id);
+  res.send(post);
+});
+
 const getPostByEmail = catchAsync(async (req, res) => {
   const email = req.params.hrEmail;
   const post = await hrService.getPostByHrEmail(email);
@@ -26,12 +71,17 @@ const getPostByEmail = catchAsync(async (req, res) => {
 const approve = catchAsync(async (req, res) => {
   const { postId, userId } = req.body;
   let post = await postService.getPostById(postId);
-  const { hrEmail } = post;
-  const hr = await hrService.getHrByEmail(hrEmail);
   const candidates = post.candidates.filter((i) => i !== userId);
-  const listUser = [...hr.listUser, userId];
+  const approves = [...post.approves, userId];
+  post = await postService.updateById(postId, { candidates, approves });
+  res.send(post);
+});
+
+const reject = catchAsync(async (req, res) => {
+  const { postId, userId } = req.body;
+  let post = await postService.getPostById(postId);
+  const candidates = post.candidates.filter((i) => i !== userId);
   post = await postService.updateById(postId, { candidates });
-  await hrService.updateByEmail(hrEmail, { listUser });
   res.send(post);
 });
 
@@ -41,9 +91,27 @@ const getHrByEmail = catchAsync(async (req, res) => {
   res.send(hr);
 });
 
+const login = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+  const hr = await hrService.login(email, password);
+  res.send(hr);
+});
+
+const updateHr = catchAsync(async (req, res) => {
+  const hr = await hrService.updateByEmail(req.params.hrEmail, req.body);
+  res.send(hr);
+});
+
 module.exports = {
   createPost,
   getPostByEmail,
   approve,
   getHrByEmail,
+  login,
+  updatePost,
+  deletePost,
+  reject,
+  getCandidates,
+  getStudents,
+  updateHr,
 };

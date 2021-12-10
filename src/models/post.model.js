@@ -17,6 +17,10 @@ const postSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
+    approves: {
+      type: [String],
+      default: [],
+    },
     image: {
       type: String,
     },

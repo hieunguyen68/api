@@ -16,9 +16,18 @@ const upload = multer({ storage });
 
 const router = express.Router();
 
-router.route('/post').post(upload.single('image'), hrController.createPost);
+router.route('/login').post(hrController.login);
+router
+  .route('/post')
+  .post(upload.single('image'), hrController.createPost)
+  .put(upload.single('image'), hrController.updatePost)
+  .delete(hrController.deletePost);
+
+router.route('/getCandidates').post(hrController.getCandidates);
+router.route('/getStudents').post(hrController.getStudents);
 router.route('/post/:hrEmail').get(hrController.getPostByEmail);
 router.route('/approve').post(hrController.approve);
-router.route('/:hrEmail').get(hrController.getHrByEmail);
+router.route('/reject').post(hrController.reject);
+router.route('/:hrEmail').get(hrController.getHrByEmail).put(hrController.updateHr);
 
 module.exports = router;
