@@ -13,13 +13,25 @@ const messageSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    messages: {
-      type: [
-        {
-          content: String,
-          owner: String,
-        },
-      ],
+    content: {
+      type: String,
+      required: true,
+    },
+    from: {
+      type: String,
+      required: true,
+    },
+    to: {
+      type: String,
+      required: true,
+    },
+    hrName: {
+      type: String,
+      required: true,
+    },
+    userName: {
+      type: String,
+      required: true,
     },
   },
   {

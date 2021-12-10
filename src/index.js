@@ -3,6 +3,7 @@ const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
 const { Server } = require('socket.io');
+const { socketController } = require('./controllers');
 
 let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
@@ -16,8 +17,14 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
     },
   });
   io.on('connect', (socket) => {
-    console.log('socket connect');
-    socket.on('message', (data) => {});
+    socket.on('message', (data) => {
+      socketController.createMessage(data);
+      const { content, from, to } = data;
+      io.emit(to, {
+        content,
+        from,
+      });
+    });
   });
 });
 
