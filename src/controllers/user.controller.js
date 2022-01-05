@@ -11,6 +11,7 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const apply = catchAsync(async (req, res) => {
+  if (req.file) req.body.cv = `${req.body._id}${path.extname(req.file.originalname)}`;
   const post = await hrService.findPost(req.body._id);
   req.body.candidates = [...post.candidates, req.body.userId];
   const updatedPost = await hrService.updatePost(req.body);

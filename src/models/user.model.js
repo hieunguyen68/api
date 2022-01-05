@@ -57,7 +57,7 @@ const userSchema = mongoose.Schema(
       type: String,
     },
     skill: {
-      type: [String],
+      type: String,
     },
     degree: {
       type: String,

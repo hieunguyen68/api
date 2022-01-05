@@ -31,7 +31,7 @@ router
     userController.updateUser
   );
 
-router.route('/apply').post(userController.apply);
+router.route('/apply').post(upload.single('cv'), userController.apply);
 
 router
   .route('/:id')
