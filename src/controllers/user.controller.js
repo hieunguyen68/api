@@ -25,6 +25,11 @@ const updateUser = catchAsync(async (req, res) => {
   res.send(user);
 });
 
+const getListUsersMessage = catchAsync(async (req, res) => {
+  const users = await userService.getListUsersMessage(req.params.id);
+  res.send(users);
+});
+
 const getUsers = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
@@ -52,4 +57,5 @@ module.exports = {
   updateUser,
   deleteUser,
   apply,
+  getListUsersMessage,
 };

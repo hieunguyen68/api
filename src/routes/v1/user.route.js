@@ -32,6 +32,7 @@ router
   );
 
 router.route('/apply').post(upload.single('cv'), userController.apply);
+router.route('/message/users/:id').get(userController.getListUsersMessage);
 
 router
   .route('/:id')
