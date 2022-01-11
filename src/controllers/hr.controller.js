@@ -102,6 +102,11 @@ const updateHr = catchAsync(async (req, res) => {
   res.send(hr);
 });
 
+const getListUserMessage = catchAsync(async (req, res) => {
+  const users = await hrService.getListUsersMessage(req.params.hrEmail);
+  res.send(users);
+});
+
 module.exports = {
   createPost,
   getPostByEmail,
@@ -114,4 +119,5 @@ module.exports = {
   getCandidates,
   getStudents,
   updateHr,
+  getListUserMessage,
 };

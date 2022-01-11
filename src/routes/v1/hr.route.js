@@ -29,5 +29,6 @@ router.route('/post/:hrEmail').get(hrController.getPostByEmail);
 router.route('/approve').post(hrController.approve);
 router.route('/reject').post(hrController.reject);
 router.route('/:hrEmail').get(hrController.getHrByEmail).put(hrController.updateHr);
+router.route('/listUserMessage/:hrEmail').get(hrController.getListUserMessage);
 
 module.exports = router;

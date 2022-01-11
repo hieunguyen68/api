@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Post, Hr } = require('../models');
+const { Post, Hr, Message } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 const updatePostById = async (_id, body) => {
@@ -50,6 +50,30 @@ const login = async (email, password) => {
   return hr;
 };
 
+const getListUsersMessage = async (hrEmail) => {
+  const messages = await Message.find({
+    hrEmail,
+  });
+  const users = [];
+  messages.forEach((message) => {
+    if (!users.includes(message.userId)) users.push(message.userId);
+  });
+  const list = new Array(users.length).fill(0);
+  const response = await Promise.all(
+    list.map((i, idx) =>
+      Message.findOne(
+        {
+          hrEmail,
+          userId: users[idx],
+        },
+        {},
+        { sort: { createdAt: -1 } }
+      )
+    )
+  );
+  return response;
+};
+
 module.exports = {
   createPost,
   updatePost,
@@ -61,4 +85,5 @@ module.exports = {
   login,
   updatePostById,
   deletePost,
+  getListUsersMessage,
 };
